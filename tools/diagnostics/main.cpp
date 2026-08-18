@@ -176,8 +176,8 @@ void saveDiagnosticsJson() {
 }
 
 int main(int argc, char* argv[]) {
-    std::cout << "RT Voice Changer Diagnostics" << std::endl;
-    std::cout << "=============================" << std::endl;
+    std::cout << "V-Morph Diagnostics" << std::endl;
+    std::cout << "===================" << std::endl;
 
     printSystemInfo();
 

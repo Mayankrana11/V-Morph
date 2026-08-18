@@ -6,8 +6,8 @@
 namespace fs = std::filesystem;
 
 void printUsage() {
-    std::cout << "Model Conversion Tool for RT Voice Changer" << std::endl;
-    std::cout << "==========================================" << std::endl;
+    std::cout << "Model Conversion Tool for V-Morph" << std::endl;
+    std::cout << "=================================" << std::endl;
     std::cout << std::endl;
     std::cout << "Usage: model_convert <command> [options]" << std::endl;
     std::cout << std::endl;
