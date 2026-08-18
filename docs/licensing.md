@@ -2,7 +2,7 @@
 
 ## Project License
 
-**RT Voice Changer**: MIT License (see LICENSE file)
+**V-Morph**: MIT License (see LICENSE file)
 
 ## Third-Party Dependencies
 
@@ -100,8 +100,8 @@ Before adding a dependency:
 All source files should include:
 
 ```cpp
-// RT Voice Changer
-// Copyright (c) 2026 Contributors
+// V-Morph
+// Copyright (c) 2026 Mayank Rana
 // SPDX-License-Identifier: MIT
 ```
 

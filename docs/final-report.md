@@ -1,6 +1,6 @@
 # Final Project Report
 
-**Project**: RT Voice Changer
+**Project**: V-Morph
 **Version**: 0.1.0
 **Date**: 2026-08-16
 
@@ -164,7 +164,7 @@
 
 ## Conclusion
 
-The RT Voice Changer project has successfully completed **STAGE 0-3** of the master plan:
+The V-Morph project has successfully completed **STAGE 0-3** of the master plan:
 
 - ✅ **STAGE 0**: Build system + repository structure
 - ✅ **STAGE 1**: Low-latency microphone → speaker passthrough

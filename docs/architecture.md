@@ -2,7 +2,7 @@
 
 ## Overview
 
-RT Voice Changer follows a strict layered architecture with clear separation of concerns:
+V-Morph follows a strict layered architecture with clear separation of concerns:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐

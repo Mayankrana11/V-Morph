@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the real-time safety rules for the RT Voice Changer audio callback and processing thread. All code executed on the real-time audio thread MUST comply with these rules.
+This document defines the real-time safety rules for the V-Morph audio callback and processing thread. All code executed on the real-time audio thread MUST comply with these rules.
 
 ---
 
