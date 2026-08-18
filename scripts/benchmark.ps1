@@ -1,6 +1,6 @@
 <#+
 .SYNOPSIS
-    Benchmark script for RT Voice Changer
+    Benchmark script for V-Morph
 #>
 
 param(
@@ -22,10 +22,15 @@ $projectRoot = Join-Path $scriptDir ".."
 $buildDir = Join-Path $projectRoot "build" "windows-$Config.ToLower()"
 $outputDir = Join-Path $projectRoot $Output
 
-Write-Host "=== RT Voice Changer Benchmark Script ===" -ForegroundColor Cyan
+Write-Host "=== V-Morph Benchmark Script ===" -ForegroundColor Cyan
 
-if (-not (Test-Path "$buildDir\bin\rtvc.exe")) {
-    Write-Error "Executable not found. Run build.ps1 first."
+# Check for benchmark executable
+$benchmarkExe = Join-Path $buildDir "bin\rtvc_benchmarks.exe"
+$latencyExe = Join-Path $buildDir "bin\latency_test.exe"
+$mainExe = Join-Path $buildDir "bin\rtvc.exe"
+
+if (-not (Test-Path $mainExe)) {
+    Write-Error "Main executable not found. Run build.ps1 first."
     exit 1
 }
 
@@ -39,31 +44,32 @@ $resultsFile = Join-Path $outputDir "benchmark_${timestamp}.json"
 
 Write-Host "Running benchmarks for $Duration seconds..." -ForegroundColor Cyan
 
-# Run application benchmark
-$benchmarkArgs = @(
-    "--benchmark",
-    "--duration", $Duration,
-    "--output", $resultsFile
-)
-
-& "$buildDir\bin\rtvc.exe" @benchmarkArgs
-$exitCode = $LASTEXITCODE
-
-if ($exitCode -ne 0) {
-    Write-Error "Benchmark failed"
-    exit $exitCode
+# Run main application benchmark if available
+if (Test-Path $benchmarkExe) {
+    Write-Host "Running rtvc_benchmarks.exe..." -ForegroundColor Cyan
+    & $benchmarkExe --model "models/test_identity.onnx" --iterations 1000 --warmup 10
+    $exitCode = $LASTEXITCODE
+    if ($exitCode -ne 0) {
+        Write-Error "Benchmark failed"
+        exit $exitCode
+    }
+} else {
+    Write-Host "Benchmark executable not found, running main app with --benchmark..." -ForegroundColor Yellow
+    & $mainExe --benchmark --duration $Duration --output $resultsFile
+    $exitCode = $LASTEXITCODE
+    if ($exitCode -ne 0) {
+        Write-Error "Benchmark failed"
+        exit $exitCode
+    }
 }
 
 # Run latency test
 Write-Host "`nRunning latency test..." -ForegroundColor Cyan
-$latencyArgs = @(
-    "--latency-test",
-    "--duration", 10,
-    "--output", (Join-Path $outputDir "latency_${timestamp}.json")
-)
-
-& "$buildDir\bin\rtvc.exe" @latencyArgs
+if (Test-Path $latencyExe) {
+    & $latencyExe --duration 10 --output (Join-Path $outputDir "latency_${timestamp}.json")
+} else {
+    & $mainExe --latency-test --duration 10 --output (Join-Path $outputDir "latency_${timestamp}.json")
+}
 
 Write-Host "`nBenchmark results saved to:" -ForegroundColor Green
-Write-Host "  $resultsFile" -ForegroundColor Yellow
-Write-Host "  $outputDir\latency_${timestamp}.json" -ForegroundColor Yellow
+Write-Host "  $outputDir" -ForegroundColor Yellow

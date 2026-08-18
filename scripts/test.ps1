@@ -1,6 +1,6 @@
 <#+
 .SYNOPSIS
-    Test script for RT Voice Changer
+    Test script for V-Morph
 #>
 
 param(
@@ -21,7 +21,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $projectRoot = Join-Path $scriptDir ".."
 $buildDir = Join-Path $projectRoot "build" "windows-$Config.ToLower()"
 
-Write-Host "=== RT Voice Changer Test Script ===" -ForegroundColor Cyan
+Write-Host "=== V-Morph Test Script ===" -ForegroundColor Cyan
 
 if (-not (Test-Path "$buildDir\bin\rtvc.exe")) {
     Write-Error "Executable not found. Run build.ps1 first."

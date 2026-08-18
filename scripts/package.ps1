@@ -1,6 +1,6 @@
 <#+
 .SYNOPSIS
-    Package script for RT Voice Changer
+    Package script for V-Morph
 #>
 
 param(
@@ -25,7 +25,7 @@ $projectRoot = Join-Path $scriptDir ".."
 $buildDir = Join-Path $projectRoot "build" "windows-$Config.ToLower()"
 $distDir = Join-Path $projectRoot $OutputDir "rtvc-$Version-windows-x64"
 
-Write-Host "=== RT Voice Changer Package Script ===" -ForegroundColor Cyan
+Write-Host "=== V-Morph Package Script ===" -ForegroundColor Cyan
 Write-Host "Version: $Version" -ForegroundColor Yellow
 Write-Host "Output: $distDir" -ForegroundColor Yellow
 

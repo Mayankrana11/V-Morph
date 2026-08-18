@@ -1,6 +1,6 @@
 <#+
 .SYNOPSIS
-    Build script for RT Voice Changer
+    Build script for V-Morph
 #>
 
 param(
@@ -30,7 +30,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $projectRoot = Join-Path $scriptDir ".."
 $buildDir = Join-Path $projectRoot "build" "windows-$Config.ToLower()"
 
-Write-Host "=== RT Voice Changer Build Script ===" -ForegroundColor Cyan
+Write-Host "=== V-Morph Build Script ===" -ForegroundColor Cyan
 Write-Host "Config: $Config" -ForegroundColor Yellow
 Write-Host "Build Dir: $buildDir" -ForegroundColor Yellow
 
