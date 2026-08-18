@@ -80,7 +80,7 @@ The application verifies:
 3. Create manifest in `models/manifests/your_model.json`
 4. Select in UI or config: `"model_path": "models/custom/your_model.onnx"`
 
-## Model Requirements for RT Voice Changer
+## Model Requirements for V-Morph
 
 | Requirement | Specification |
 |-------------|---------------|
