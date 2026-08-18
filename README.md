@@ -1,4 +1,4 @@
-# RT Voice Changer
+# V-Morph
 
 Real-time AI Voice Changer for Windows - Low-latency voice conversion for gaming, Discord, and VoIP applications.
 
@@ -64,7 +64,7 @@ cmake --build --preset windows-release
 2. In Windows Sound Settings:
    - Set **CABLE Input (VB-Audio Virtual Cable)** as your default **Output** device
    - Set **CABLE Output (VB-Audio Virtual Cable)** as your **Input** device in Discord
-3. In RT Voice Changer:
+3. In V-Morph:
    - Select your physical microphone as **Input**
    - Select **CABLE Input** as **Output**
 
@@ -145,6 +145,7 @@ Virtual Microphone / Speakers
 Currently implemented:
 - **Passthrough** - Zero processing (testing baseline)
 - **DSP Effects** - Gain, high-pass filter, limiter
+- **ONNX Runtime Voice Converter** - Streaming ONNX model inference (NEW)
 
 Planned:
 - **LLVC** - Low-latency voice conversion
