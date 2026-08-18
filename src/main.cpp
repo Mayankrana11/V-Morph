@@ -2,6 +2,7 @@
 #include "audio/AudioEngine.h"
 #include "vc/PassthroughConverter.h"
 #include "vc/DSPVoiceConverter.h"
+#include "vc/OnnxVoiceConverter.h"
 #include "vc/VoiceConverter.h"
 #include "threading/RealtimeThread.h"
 #include "metrics/PerformanceMonitor.h"
@@ -221,6 +222,8 @@ bool Application::loadConverter(const std::string& type, const std::string& mode
         pimpl_->voice_converter = std::make_unique<PassthroughConverter>();
     } else if (type == "dsp") {
         pimpl_->voice_converter = std::make_unique<DSPVoiceConverter>();
+    } else if (type == "onnx" || type == "streaming") {
+        pimpl_->voice_converter = std::make_unique<OnnxVoiceConverter>();
     } else {
         std::cerr << "Unknown converter type: " << type << "\n";
         return false;
@@ -264,7 +267,7 @@ const PerformanceMonitor& Application::getPerformanceMonitor() const {
 }
 
 void Application::printDiagnostics() const {
-    std::cout << "=== RT Voice Changer Diagnostics ===\n";
+    std::cout << "=== V-Morph Diagnostics ===\n";
     std::cout << "Audio Engine: " << (pimpl_->audio_engine ? "Initialized" : "Not initialized") << "\n";
     std::cout << "Audio State: " << static_cast<int>(pimpl_->audio_engine ? pimpl_->audio_engine->getState() : AudioState::Stopped) << "\n";
     std::cout << "Converter: " << getCurrentConverter() << "\n";

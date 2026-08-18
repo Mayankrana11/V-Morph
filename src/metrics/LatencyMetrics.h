@@ -95,6 +95,12 @@ private:
 
     // Cross-correlation for latency detection
     double crossCorrelate(const float* a, const float* b, size_t len, size_t max_lag);
-};
+
+    // Internal state
+    std::vector<float> input_history_;
+    std::vector<float> output_history_;
+    size_t history_pos_ = 0;
+    bool impulse_pending_ = false;
+    size_t impulse_input_pos_ = 0;
 
 } // namespace rtvcc

@@ -1,4 +1,5 @@
 #include "VoiceConverter.h"
+#include "OnnxVoiceConverter.h"
 #include <memory>
 
 namespace rtvcc {
@@ -16,6 +17,8 @@ std::unique_ptr<IVoiceConverter> createVoiceConverter(const std::string& type) {
         return std::make_unique<PassthroughConverter>();
     } else if (type == "dsp") {
         return std::make_unique<DSPVoiceConverter>();
+    } else if (type == "onnx" || type == "streaming") {
+        return std::make_unique<OnnxVoiceConverter>();
     }
     return nullptr;
 }

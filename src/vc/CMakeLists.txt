@@ -4,7 +4,7 @@ add_library(rtvc_vc STATIC
     VoiceConverter.cpp
     PassthroughConverter.cpp
     DSPVoiceConverter.cpp
-    StreamingVC.cpp
+    OnnxVoiceConverter.cpp
 )
 
 target_include_directories(rtvc_vc PUBLIC

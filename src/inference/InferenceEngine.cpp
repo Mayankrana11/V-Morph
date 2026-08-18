@@ -1,4 +1,5 @@
 #include "InferenceEngine.h"
+#include "OnnxInferenceEngine.h"
 #include <algorithm>
 
 namespace rtvcc {
@@ -30,8 +31,7 @@ IInferenceEngine::~IInferenceEngine() = default;
 
 std::unique_ptr<IInferenceEngine> createInferenceEngine(const std::string& type) {
     if (type == "onnx") {
-        // Return ONNX implementation when available
-        return nullptr;
+        return std::make_unique<OnnxInferenceEngine>();
     }
     return nullptr;
 }

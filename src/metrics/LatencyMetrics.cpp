@@ -131,8 +131,13 @@ LatencyTester::LatencyTester(int sample_rate) : sample_rate_(sample_rate) {
     impulse_.assign(sample_rate / 10, 0.0f); // 100ms buffer
     impulse_[0] = 1.0f;
 
-    input_buffer_.assign(sample_rate, 0.0f);
-    output_buffer_.assign(sample_rate, 0.0f);
+    // History buffers for cross-correlation (2 seconds each)
+    size_t history_len = static_cast<size_t>(sample_rate * 2);
+    input_history_.assign(history_len, 0.0f);
+    output_history_.assign(history_len, 0.0f);
+    history_pos_ = 0;
+    impulse_pending_ = false;
+    impulse_input_pos_ = 0;
 }
 
 LatencyTester::~LatencyTester() = default;
@@ -143,17 +148,77 @@ void LatencyTester::generateImpulse(float* buffer, size_t frames) {
 }
 
 double LatencyTester::process(const float* input, const float* output, size_t frames) {
-    // Simple cross-correlation to find impulse in output
-    // This is a simplified version - real implementation would be more robust
+    // Store input and output in circular history buffers
+    for (size_t i = 0; i < frames; ++i) {
+        input_history_[history_pos_] = input[i];
+        output_history_[history_pos_] = output[i];
+        history_pos_ = (history_pos_ + 1) % input_history_.size();
+    }
+
+    // Check if we should send an impulse (every ~2 seconds)
+    static size_t frames_since_impulse = 0;
+    frames_since_impulse += frames;
+    
+    const size_t impulse_interval = sample_rate_ * 2; // Every 2 seconds
+    
+    if (!impulse_pending_ && frames_since_impulse >= impulse_interval) {
+        impulse_pending_ = true;
+        impulse_input_pos_ = (history_pos_ + input_history_.size() - frames) % input_history_.size();
+        frames_since_impulse = 0;
+    }
+
+    // If we have an impulse pending, try to detect it in output
+    if (impulse_pending_) {
+        // Search for impulse in recent output history
+        size_t search_start = (impulse_input_pos_ + sample_rate_ / 100) % output_history_.size(); // 10ms minimum delay
+        size_t search_len = std::min(sample_rate_ / 2, output_history_.size()); // Search up to 500ms
+        
+        // Extract linearized output segment
+        std::vector<float> output_segment;
+        output_segment.reserve(search_len);
+        for (size_t i = 0; i < search_len; ++i) {
+            size_t idx = (search_start + i) % output_history_.size();
+            output_segment.push_back(output_history_[idx]);
+        }
+
+        // Find peak in output (impulse response)
+        float max_val = 0.0f;
+        size_t max_idx = 0;
+        for (size_t i = 0; i < output_segment.size(); ++i) {
+            float abs_val = std::abs(output_segment[i]);
+            if (abs_val > max_val) {
+                max_val = abs_val;
+                max_idx = i;
+            }
+        }
+
+        // If we found a significant peak (> 0.1), measure latency
+        if (max_val > 0.1f) {
+            double latency_ms = static_cast<double>(max_idx + (search_start + input_history_.size() - impulse_input_pos_) % input_history_.size()) / sample_rate_ * 1000.0;
+            
+            // Sanity check: latency should be reasonable (1-500ms)
+            if (latency_ms > 1.0 && latency_ms < 500.0) {
+                measurements_.push_back(latency_ms);
+                if (measurements_.size() > 1000) {
+                    measurements_.erase(measurements_.begin());
+                }
+            }
+            
+            impulse_pending_ = false;
+            return latency_ms;
+        }
+    }
+
     return -1.0;
 }
 
 void LatencyTester::reset() {
-    buffer_pos_ = 0;
-    impulse_sent_ = false;
+    history_pos_ = 0;
+    impulse_pending_ = false;
+    impulse_input_pos_ = 0;
     measurements_.clear();
-    std::fill(input_buffer_.begin(), input_buffer_.end(), 0.0f);
-    std::fill(output_buffer_.begin(), output_buffer_.end(), 0.0f);
+    std::fill(input_history_.begin(), input_history_.end(), 0.0f);
+    std::fill(output_history_.begin(), output_history_.end(), 0.0f);
 }
 
 double LatencyTester::getLatencyMs() const {
