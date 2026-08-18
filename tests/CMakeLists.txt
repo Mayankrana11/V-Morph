@@ -10,6 +10,8 @@ add_executable(rtvc_tests
     test_voice_converter.cpp
     test_metrics.cpp
     test_threading.cpp
+    test_inference.cpp
+    test_onnx_converter.cpp
     test_main.cpp
 )
 
