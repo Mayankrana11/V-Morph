@@ -1,0 +1,62 @@
+# Build directories
+build/
+out/
+bin/
+lib/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+Testing/
+
+# vcpkg
+vcpkg/
+packages/
+installed/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Model files (large, not tracked)
+models/*.onnx
+models/*.bin
+models/*.pt
+models/*.pth
+models/*.safetensors
+models/manifests/*.json
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+
+# Benchmark results
+benchmark_results/
+
+# Test output
+test_output/
+
+# Package output
+*.msi
+*.exe
+*.zip
+*.tar.gz

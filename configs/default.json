@@ -1,0 +1,41 @@
+{
+    "audio": {
+        "input_device_id": "",
+        "output_device_id": "",
+        "sample_rate": 48000,
+        "buffer_frames": 128,
+        "exclusive_mode": true
+    },
+    "voice": {
+        "converter_type": "passthrough",
+        "model_path": "",
+        "target_voice": "",
+        "pitch_shift": 0.0,
+        "formant_shift": 1.0,
+        "mix": 1.0,
+        "output_gain_db": 0.0,
+        "chunk_size_ms": 20
+    },
+    "dsp": {
+        "input_gain_db": 0.0,
+        "highpass_cutoff_hz": 80.0,
+        "limiter_threshold_db": -1.0,
+        "limiter_release_ms": 50.0,
+        "enable_highpass": true,
+        "enable_limiter": true
+    },
+    "performance": {
+        "execution_provider": "CPU",
+        "inference_threads": 1
+    },
+    "runtime": {
+        "auto_start": false,
+        "bypass": false,
+        "show_performance": true
+    },
+    "paths": {
+        "config_dir": "",
+        "models_dir": "models",
+        "logs_dir": "logs"
+    }
+}
