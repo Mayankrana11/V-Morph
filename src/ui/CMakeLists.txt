@@ -18,3 +18,7 @@ target_link_libraries(rtvc_ui PRIVATE
 if(USE_IMGUI)
     target_link_libraries(rtvc_ui PRIVATE imgui)
 endif()
+
+if(WIN32)
+    target_link_libraries(rtvc_ui PRIVATE d3d11 dxgi)
+endif()

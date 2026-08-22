@@ -26,6 +26,26 @@ struct InferenceConfig {
     bool enable_profiling = false;
     bool graph_optimization = true;
     std::string cache_dir;
+    
+    // Optimization options
+    enum class Precision {
+        FP32,
+        FP16,
+        INT8
+    };
+    Precision precision = Precision::FP32;
+    bool enable_quantization = false;
+    std::string quantization_calibration_data;  // Path to calibration data for INT8
+    
+    // TensorRT specific
+    size_t tensorrt_workspace_size = 1 << 30;  // 1GB default
+    int tensorrt_min_timing_iterations = 2;
+    int tensorrt_avg_timing_iterations = 1;
+    
+    // CPU specific
+    bool enable_cpu_mem_arena = true;
+    bool enable_cpu_mem_pattern = true;
+    OrtExecutionMode execution_mode = OrtExecutionMode::ORT_SEQUENTIAL;
 };
 
 // Model metadata/manifest

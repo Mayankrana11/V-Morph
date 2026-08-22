@@ -1,4 +1,5 @@
 #include "Resampler.h"
+#include "SimdDsp.h"
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -88,43 +89,24 @@ void Gain::setRampTime(float seconds) {
 
 void Gain::process(float* data, size_t frames) {
     if (ramp_increment_ == 0.0f) {
-        // No ramping, apply constant gain
+        // No ramping, apply constant gain - use SIMD
         if (current_gain_ != 1.0f) {
-            for (size_t i = 0; i < frames; ++i) {
-                data[i] *= current_gain_;
-            }
+            simd::applyGainAVX2(data, frames, current_gain_);
         }
     } else {
-        // Ramping
-        for (size_t i = 0; i < frames; ++i) {
-            data[i] *= current_gain_;
-            current_gain_ += ramp_increment_;
-            if ((ramp_increment_ > 0 && current_gain_ >= target_gain_) ||
-                (ramp_increment_ < 0 && current_gain_ <= target_gain_)) {
-                current_gain_ = target_gain_;
-                ramp_increment_ = 0.0f;
-            }
-        }
+        // Ramping - use SIMD with ramp
+        simd::applyGainRampedAVX2(data, frames, current_gain_, target_gain_, ramp_increment_);
     }
 }
 
 void Gain::processInterleaved(float* data, size_t frames, size_t channels) {
     if (ramp_increment_ == 0.0f) {
         if (current_gain_ != 1.0f) {
-            for (size_t i = 0; i < frames * channels; ++i) {
-                data[i] *= current_gain_;
-            }
+            simd::applyGainAVX2(data, frames * channels, current_gain_);
         }
     } else {
-        for (size_t i = 0; i < frames * channels; ++i) {
-            data[i] *= current_gain_;
-            current_gain_ += ramp_increment_;
-            if ((ramp_increment_ > 0 && current_gain_ >= target_gain_) ||
-                (ramp_increment_ < 0 && current_gain_ <= target_gain_)) {
-                current_gain_ = target_gain_;
-                ramp_increment_ = 0.0f;
-            }
-        }
+        // For interleaved with ramping, process as flat array
+        simd::applyGainRampedAVX2(data, frames * channels, current_gain_, target_gain_, ramp_increment_);
     }
 }
 
@@ -181,6 +163,24 @@ void Limiter::process(float* data, size_t frames, size_t channels) {
         impl.delay_write_ = 0;
     }
 
+    // Use SIMD optimized version for mono
+    if (channels == 1) {
+        simd::limiterProcessAVX2(data, frames, channels, 
+                                 impl.threshold_, impl.release_coeff_,
+                                 impl.envelope_, impl.gain_);
+        
+        // Handle delay line for lookahead
+        for (size_t i = 0; i < frames; ++i) {
+            impl.delay_line_[impl.delay_write_] = data[i];
+            impl.delay_write_ = (impl.delay_write_ + 1) % impl.lookahead_samples_;
+            
+            size_t read_pos = impl.delay_write_;
+            data[i] = impl.delay_line_[read_pos] * impl.gain_;
+        }
+        return;
+    }
+
+    // Multi-channel fallback (original implementation)
     for (size_t i = 0; i < frames; ++i) {
         // Find peak across channels for this frame
         float peak = 0.0f;

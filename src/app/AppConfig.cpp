@@ -19,6 +19,11 @@ bool AppConfig::loadFromFile(const std::string& path) {
         buffer_frames = j.value("buffer_frames", 128);
         exclusive_mode = j.value("exclusive_mode", true);
 
+        // Virtual audio (support both flat and nested)
+        auto virtual_audio = j.value("virtual_audio", nlohmann::json::object());
+        use_virtual_output = virtual_audio.value("use_virtual_output", j.value("use_virtual_output", false));
+        virtual_output_device_id = virtual_audio.value("virtual_output_device_id", j.value("virtual_output_device_id", ""));
+
         // Voice converter
         converter_type = j.value("converter_type", "passthrough");
         model_path = j.value("model_path", "");
@@ -66,6 +71,10 @@ bool AppConfig::saveToFile(const std::string& path) const {
         j["sample_rate"] = sample_rate;
         j["buffer_frames"] = buffer_frames;
         j["exclusive_mode"] = exclusive_mode;
+
+        // Virtual audio (nested)
+        j["virtual_audio"]["use_virtual_output"] = use_virtual_output;
+        j["virtual_audio"]["virtual_output_device_id"] = virtual_output_device_id;
 
         j["converter_type"] = converter_type;
         j["model_path"] = model_path;

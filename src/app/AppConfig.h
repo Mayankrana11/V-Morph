@@ -13,6 +13,10 @@ struct AppConfig {
     int buffer_frames = 128;
     bool exclusive_mode = true;
 
+    // Virtual audio routing
+    bool use_virtual_output = false;
+    std::string virtual_output_device_id;
+
     // Voice converter settings
     std::string converter_type = "passthrough";
     std::string model_path;

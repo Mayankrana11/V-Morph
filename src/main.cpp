@@ -4,6 +4,7 @@
 #include "vc/DSPVoiceConverter.h"
 #include "vc/OnnxVoiceConverter.h"
 #include "vc/VoiceConverter.h"
+#include "ui/MainWindow.h"
 #include "threading/RealtimeThread.h"
 #include "metrics/PerformanceMonitor.h"
 #include "metrics/LatencyMetrics.h"
@@ -131,12 +132,16 @@ int Application::run(int argc, char* argv[]) {
         } else if (arg == "--latency-test") {
             // Run latency test
             return 0;
+        } else if (arg == "--gui") {
+            // Run GUI mode
+            return runGui();
         } else if (arg == "--help") {
-            std::cout << "Usage: rtvc [options]\n";
+            std::cout << "Usage: v-morph [options]\n";
             std::cout << "  --list-devices     List audio devices\n";
             std::cout << "  --diagnostics      Print diagnostics\n";
             std::cout << "  --benchmark        Run benchmark\n";
             std::cout << "  --latency-test     Run latency test\n";
+            std::cout << "  --gui              Run GUI mode\n";
             return 0;
         }
     }
@@ -172,9 +177,26 @@ int Application::run(int argc, char* argv[]) {
 }
 
 int Application::runGui() {
-    // TODO: Implement GUI mode
-    std::cerr << "GUI mode not yet implemented\n";
-    return 1;
+    MainWindow window;
+    window.setAudioEngine(this);
+    
+    if (!window.initialize()) {
+        std::cerr << "Failed to initialize GUI\n";
+        return 1;
+    }
+    
+    // Start audio in background
+    if (!startAudio()) {
+        std::cerr << "Failed to start audio\n";
+        return 1;
+    }
+    
+    window.run();
+    
+    stopAudio();
+    window.shutdown();
+    
+    return 0;
 }
 
 bool Application::startAudio() {
@@ -393,6 +415,8 @@ int main(int argc, char* argv[]) {
     config.sample_rate = 48000;
     config.buffer_frames = 128;
     config.converter_type = "passthrough";
+    config.use_virtual_output = false;
+    config.virtual_output_device_id = "";
 
     if (!app.initialize(config)) {
         return 1;

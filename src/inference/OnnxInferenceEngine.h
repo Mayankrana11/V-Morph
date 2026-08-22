@@ -27,7 +27,11 @@ public:
                              std::vector<std::pair<std::string, float*>>& outputs) override;
 
     bool warmup() override;
+    bool warmup(int iterations);
     void reset() override;
+
+    // Export optimized model (for TensorRT engine cache)
+    bool exportOptimizedModel(const std::string& output_path) const;
 
     bool isReady() const override;
     std::string getLastError() const override;

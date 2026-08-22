@@ -73,15 +73,15 @@ if(WIN32)
 endif()
 
 # Main executable
-add_executable(rtvc main.cpp)
-target_link_libraries(rtvc PRIVATE rtvc_core)
+add_executable(v-morph main.cpp)
+target_link_libraries(v-morph PRIVATE rtvc_core)
 
 if(BUILD_TESTS)
-    target_link_libraries(rtvc PRIVATE GTest::gtest GTest::gtest_main)
+    target_link_libraries(v-morph PRIVATE GTest::gtest GTest::gtest_main)
 endif()
 
 # Install headers
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rtvc
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/v-morph
     FILES_MATCHING PATTERN "*.h"
 )
