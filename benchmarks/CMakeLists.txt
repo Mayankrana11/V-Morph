@@ -1,9 +1,9 @@
 # Benchmarks
 
-add_executable(rtvc_benchmarks
+add_executable(v-morph_benchmarks
     main.cpp
 )
 
-target_link_libraries(rtvc_benchmarks PRIVATE
+target_link_libraries(v-morph_benchmarks PRIVATE
     rtvc_core
 )
