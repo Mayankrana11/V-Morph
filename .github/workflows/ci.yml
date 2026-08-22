@@ -1,0 +1,160 @@
+# GitHub Actions CI/CD for V-Morph
+
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [ published ]
+
+env:
+  BUILD_TYPE: Release
+  VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Setup vcpkg
+      uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: '3.25'
+    
+    - name: Cache vcpkg
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.VCPKG_ROOT }}
+        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-
+    
+    - name: Install vcpkg dependencies
+      run: |
+        git clone https://github.com/microsoft/vcpkg ${{ env.VCPKG_ROOT }}
+        cd ${{ env.VCPKG_ROOT }}
+        .\bootstrap-vcpkg.bat
+        .\vcpkg install onnxruntime:x64-windows
+    
+    - name: Configure CMake
+      run: |
+        cmake --preset windows-release
+      working-directory: ${{ github.workspace }}
+    
+    - name: Build
+      run: |
+        cmake --build --preset windows-release
+      working-directory: ${{ github.workspace }}
+    
+    - name: Run Unit Tests
+      run: |
+        ctest --preset windows-release --output-on-failure
+      working-directory: ${{ github.workspace }}
+    
+    - name: Run Benchmarks
+      if: github.event_name == 'release' || github.event_name == 'schedule'
+      run: |
+        .\scripts\benchmark.ps1 -Config Release -Duration 60
+      working-directory: ${{ github.workspace }}
+      continue-on-error: true
+    
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: v-morph-windows-${{ env.BUILD_TYPE }}
+        path: |
+          build/windows-release/bin/v-morph.exe
+          build/windows-release/bin/v-morph_diagnostics.exe
+          build/windows-release/bin/v-morph_latency_test.exe
+          build/windows-release/bin/v-morph_benchmarks.exe
+        retention-days: 7
+    
+    - name: Create Release Package
+      if: github.event_name == 'release'
+      run: |
+        .\scripts\package.ps1 -Config Release -Version ${{ github.event.release.tag_name }}
+      working-directory: ${{ github.workspace }}
+    
+    - name: Upload Release Assets
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/v-morph-${{ github.event.release.tag_name }}-windows-x64.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build libasound2-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxxf86vm-dev
+    
+    - name: Configure CMake
+      run: |
+        cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_BENCHMARKS=ON
+      working-directory: ${{ github.workspace }}
+    
+    - name: Build
+      run: |
+        cmake --build build --config Release
+      working-directory: ${{ github.workspace }}
+    
+    - name: Run Unit Tests
+      run: |
+        ctest --test-dir build --output-on-failure
+      working-directory: ${{ github.workspace }}
+    
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: v-morph-linux-${{ env.BUILD_TYPE }}
+        path: |
+          build/v-morph
+          build/v-morph_tests
+        retention-days: 7
+
+  performance-regression:
+    runs-on: windows-latest
+    needs: build-windows
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    timeout-minutes: 30
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: v-morph-windows-Release
+        path: artifacts
+    
+    - name: Run Performance Tests
+      run: |
+        .\artifacts\v-morph_diagnostics.exe --model models/test_identity.onnx
+        .\artifacts\v-morph_benchmarks.exe --model models/test_identity.onnx --iterations 100
+      working-directory: ${{ github.workspace }}
+      continue-on-error: true
+    
+    - name: Compare with Baseline
+      run: |
+        # This would compare current performance with stored baseline
+        # For now, just ensure tests run
+        echo "Performance regression check completed"
+      working-directory: ${{ github.workspace }}

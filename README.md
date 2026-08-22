@@ -54,8 +54,11 @@ cmake --preset windows-release
 # Build
 cmake --build --preset windows-release
 
-# Run
-.\build\windows-release\bin\rtvc.exe --list-devices
+# Run CLI
+.\build\windows-release\bin\v-morph.exe --list-devices
+
+# Run GUI
+.\build\windows-release\bin\v-morph.exe --gui
 ```
 
 ### 3. Configure Virtual Audio (for Discord)
@@ -74,19 +77,22 @@ cmake --build --preset windows-release
 
 ```bash
 # List audio devices
-rtvc.exe --list-devices
+v-morph.exe --list-devices
 
 # Print diagnostics
-rtvc.exe --diagnostics
+v-morph.exe --diagnostics
 
 # Run with custom config
-rtvc.exe --config configs/development.json
+v-morph.exe --config configs/development.json
 
 # Run benchmark
-rtvc.exe --benchmark
+v-morph.exe --benchmark
 
 # Latency test
-rtvc.exe --latency-test
+v-morph.exe --latency-test
+
+# Run GUI
+v-morph.exe --gui
 ```
 
 ### Configuration
@@ -100,10 +106,26 @@ Edit `configs/default.json` or create your own:
         "buffer_frames": 128,
         "exclusive_mode": true
     },
+    "virtual_audio": {
+        "use_virtual_output": false,
+        "virtual_output_device_id": ""
+    },
     "voice": {
         "converter_type": "passthrough",
         "model_path": "models/your_model.onnx",
         "chunk_size_ms": 20
+    },
+    "dsp": {
+        "input_gain_db": 0.0,
+        "highpass_cutoff_hz": 80.0,
+        "limiter_threshold_db": -1.0,
+        "limiter_release_ms": 50.0,
+        "enable_highpass": true,
+        "enable_limiter": true
+    },
+    "performance": {
+        "execution_provider": "CPU",
+        "inference_threads": 1
     }
 }
 ```
@@ -244,17 +266,10 @@ Third-party licenses documented in `docs/licensing.md`.
 4. Add tests for new functionality
 5. Submit PR with description
 
-## Roadmap
 
-- [ ] STAGE 0: Build system ✓
-- [ ] STAGE 1: Audio passthrough ✓
-- [ ] STAGE 2: Lock-free pipeline ✓
-- [ ] STAGE 3: DSP effects ✓
-- [ ] STAGE 4: Inference abstraction ✓
-- [ ] STAGE 5: ONNX Runtime integration
-- [ ] STAGE 6: Streaming VC model
-- [ ] STAGE 7: Optimization
-- [ ] STAGE 8: Virtual mic integration
-- [ ] STAGE 9: Desktop UI
-- [ ] STAGE 10: Packaging
-- [ ] STAGE 11: Automated tests
+### Future Enhancements
+- Real voice conversion model integration (LLVC, StreamVC)
+- Speaker embedding profiles
+- Noise suppression and echo cancellation
+- macOS/Linux audio backends
+- MSI installer with code signing
