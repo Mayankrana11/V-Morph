@@ -6,6 +6,10 @@
         "buffer_frames": 128,
         "exclusive_mode": true
     },
+    "virtual_audio": {
+        "use_virtual_output": false,
+        "virtual_output_device_id": ""
+    },
     "voice": {
         "converter_type": "passthrough",
         "model_path": "",
