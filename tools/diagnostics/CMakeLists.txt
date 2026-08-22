@@ -1,9 +1,9 @@
 # Diagnostics Tool
 
-add_executable(rtvc_diagnostics
+add_executable(v-morph_diagnostics
     main.cpp
 )
 
-target_link_libraries(rtvc_diagnostics PRIVATE
+target_link_libraries(v-morph_diagnostics PRIVATE
     rtvc_core
 )
