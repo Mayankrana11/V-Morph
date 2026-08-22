@@ -23,13 +23,13 @@ $ErrorActionPreference = "Stop"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $projectRoot = Join-Path $scriptDir ".."
 $buildDir = Join-Path $projectRoot "build" "windows-$Config.ToLower()"
-$distDir = Join-Path $projectRoot $OutputDir "rtvc-$Version-windows-x64"
+$distDir = Join-Path $projectRoot $OutputDir "v-morph-$Version-windows-x64"
 
 Write-Host "=== V-Morph Package Script ===" -ForegroundColor Cyan
 Write-Host "Version: $Version" -ForegroundColor Yellow
 Write-Host "Output: $distDir" -ForegroundColor Yellow
 
-if (-not (Test-Path "$buildDir\bin\rtvc.exe")) {
+if (-not (Test-Path "$buildDir\bin\v-morph.exe")) {
     Write-Error "Executable not found. Run build.ps1 first."
     exit 1
 }
@@ -42,7 +42,7 @@ New-Item -ItemType Directory -Path $distDir | Out-Null
 
 # Copy executable and DLLs
 Write-Host "Copying binaries..." -ForegroundColor Cyan
-Copy-Item "$buildDir\bin\rtvc.exe" "$distDir\" -Force
+Copy-Item "$buildDir\bin\v-morph.exe" "$distDir\" -Force
 
 # Copy config files
 Write-Host "Copying configs..." -ForegroundColor Cyan
@@ -69,8 +69,8 @@ Set-Location $buildDir
 if ($LASTEXITCODE -eq 0) {
     $zipFile = Get-ChildItem $buildDir -Filter "*.zip" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if ($zipFile) {
-        Copy-Item $zipFile.FullName "$distDir\..\rtvc-$Version-windows-x64.zip" -Force
-        Write-Host "Installer created: $distDir\..\rtvc-$Version-windows-x64.zip" -ForegroundColor Green
+        Copy-Item $zipFile.FullName "$distDir\..\v-morph-$Version-windows-x64.zip" -Force
+        Write-Host "Installer created: $distDir\..\v-morph-$Version-windows-x64.zip" -ForegroundColor Green
     }
 }
 

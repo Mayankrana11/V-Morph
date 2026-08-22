@@ -25,9 +25,9 @@ $outputDir = Join-Path $projectRoot $Output
 Write-Host "=== V-Morph Benchmark Script ===" -ForegroundColor Cyan
 
 # Check for benchmark executable
-$benchmarkExe = Join-Path $buildDir "bin\rtvc_benchmarks.exe"
+$benchmarkExe = Join-Path $buildDir "bin\v-morph_benchmarks.exe"
 $latencyExe = Join-Path $buildDir "bin\latency_test.exe"
-$mainExe = Join-Path $buildDir "bin\rtvc.exe"
+$mainExe = Join-Path $buildDir "bin\v-morph.exe"
 
 if (-not (Test-Path $mainExe)) {
     Write-Error "Main executable not found. Run build.ps1 first."
@@ -46,7 +46,7 @@ Write-Host "Running benchmarks for $Duration seconds..." -ForegroundColor Cyan
 
 # Run main application benchmark if available
 if (Test-Path $benchmarkExe) {
-    Write-Host "Running rtvc_benchmarks.exe..." -ForegroundColor Cyan
+    Write-Host "Running v-morph_benchmarks.exe..." -ForegroundColor Cyan
     & $benchmarkExe --model "models/test_identity.onnx" --iterations 1000 --warmup 10
     $exitCode = $LASTEXITCODE
     if ($exitCode -ne 0) {

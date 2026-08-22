@@ -23,7 +23,7 @@ $buildDir = Join-Path $projectRoot "build" "windows-$Config.ToLower()"
 
 Write-Host "=== V-Morph Test Script ===" -ForegroundColor Cyan
 
-if (-not (Test-Path "$buildDir\bin\rtvc.exe")) {
+if (-not (Test-Path "$buildDir\bin\v-morph.exe")) {
     Write-Error "Executable not found. Run build.ps1 first."
     exit 1
 }

@@ -89,4 +89,4 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "Build successful!" -ForegroundColor Green
-Write-Host "Executable: $buildDir\bin\rtvc.exe" -ForegroundColor Green
+Write-Host "Executable: $buildDir\bin\v-morph.exe" -ForegroundColor Green
